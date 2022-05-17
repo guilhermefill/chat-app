@@ -4,3 +4,4 @@ dist
 *.log
 package.json.lock
 yarn.lock
+server/node_modules

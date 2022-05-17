@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import { registerRoute } from '../utils/apiRoutes';
 
 const Register = () => {
+	const navigate = useNavigate();
 	const [values, setValues] = useState({
 		username: '',
 		email: '',
 		password: '',
 		confirmPassword: '',
 	});
+
+	useEffect(() => {
+		if (localStorage.getItem('chat-app-user')) {
+			navigate('/chat');
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handleChange = (event) => {
 		setValues({ ...values, [event.target.name]: event.target.value });
@@ -34,11 +42,18 @@ const Register = () => {
 		event.preventDefault();
 		if (handleValidation()) {
 			const { username, email, password } = values;
-			const { data } = await axios.post(registerRoute, {
+			const createdUser = await axios.post(registerRoute, {
 				username,
 				email,
 				password,
 			});
+			if (createdUser.status === 200) {
+				localStorage.setItem(
+					'chat-app-user',
+					JSON.stringify(createdUser.data.user)
+				);
+				navigate('/chat');
+			}
 		}
 	};
 

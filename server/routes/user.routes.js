@@ -15,7 +15,26 @@ router.post('/register', async (req, res) => {
 			email,
 			password: hashedPassword,
 		});
+		delete user.password;
 		res.json(user);
+	} catch (error) {
+		console.log(error);
+	}
+});
+
+router.post('/login', async (req, res) => {
+	const { username, password } = req.body;
+	try {
+		const user = await User.findOne({ username });
+		if (!user) {
+			res.json({ message: 'incorrect username or password' });
+		}
+		const ifPasswordValid = await bcrypt.compare(password, user.password);
+		if (!ifPasswordValid) {
+			res.json({ message: 'incorrect username or password' });
+		}
+		delete user.password;
+		return res.json({ user });
 	} catch (error) {
 		console.log(error);
 	}
